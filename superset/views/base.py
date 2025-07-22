@@ -262,6 +262,10 @@ def menu_data(user: User) -> dict[str, Any]:
     if callable(brand_text := appbuilder.app.config["LOGO_RIGHT_TEXT"]):
         brand_text = brand_text()
 
+    app_root = appbuilder.app.config["APPLICATION_ROOT"]
+    if app_root.endswith("/"):
+        app_root = app_root.rstrip("/")
+
     return {
         "menu": appbuilder.menu.get_data(),
         "brand": {
@@ -289,7 +293,7 @@ def menu_data(user: User) -> dict[str, Any]:
             "show_language_picker": len(languages) > 1,
             "user_is_anonymous": user.is_anonymous,
             "user_info_url": (
-                None if is_feature_enabled("MENU_HIDE_USER_INFO") else "/user_info/"
+                None if is_feature_enabled("MENU_HIDE_USER_INFO") else app_root + "/user_info/"
             ),
             "user_logout_url": appbuilder.get_url_for_logout,
             "user_login_url": appbuilder.get_url_for_login,

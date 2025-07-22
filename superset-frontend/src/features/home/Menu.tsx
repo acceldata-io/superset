@@ -34,6 +34,7 @@ import {
   MenuData,
 } from 'src/types/bootstrapTypes';
 import RightMenu from './RightMenu';
+import { applicationRoot } from 'src/utils/getBootstrapData';
 
 interface MenuProps {
   data: MenuData;
@@ -266,6 +267,7 @@ export function Menu({
   };
   const renderBrand = () => {
     let link;
+    let rootUrl = applicationRoot();
     if (theme.brandLogoUrl) {
       let style = { padding: '0px', margin: '0px' } as React.CSSProperties;
       if (theme.brandLogoHeight) {
@@ -276,13 +278,13 @@ export function Menu({
       }
       link = (
         <Typography.Link
-          href={theme.brandLogoHref}
+          href={rootUrl + theme.brandLogoHref}
           className="navbar-brand"
           style={style}
         >
           <Image
             preview={false}
-            src={theme.brandLogoUrl}
+            src={rootUrl + theme.brandLogoUrl}
             alt={theme.brandLogoAlt || 'Apache Superset'}
           />
         </Typography.Link>
