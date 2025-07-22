@@ -126,7 +126,7 @@ export default function Login() {
               {providers.map((provider: OIDProvider) => (
                 <Form.Item<LoginForm>>
                   <Button
-                    href={`/login/${provider.name}`}
+                    href={`${bootstrapData.common.application_root}/login/${provider.name}`}
                     block
                     iconPosition="start"
                     icon={getAuthIconElement(provider.name)}
@@ -144,7 +144,7 @@ export default function Login() {
               {providers.map((provider: OAuthProvider) => (
                 <Form.Item<LoginForm>>
                   <Button
-                    href={`/login/${provider.name}`}
+                    href={`${bootstrapData.common.application_root}/login/${provider.name}`}
                     block
                     iconPosition="start"
                     icon={getAuthIconElement(provider.name)}
