@@ -387,7 +387,10 @@ function ChartList(props: ChartListProps) {
           },
         }: any) => (
           <Tooltip title={dsNameTxt} placement="top">
-            <GenericLink to={dsUrl}>{dsNameTxt?.split('.')[1]}</GenericLink>
+            {/* dsNameTxt can be undefined, schema.name or just name */}
+            <GenericLink to={dsUrl}>
+              {dsNameTxt ? dsNameTxt.split('.')[1] || dsNameTxt : ''}
+            </GenericLink>
           </Tooltip>
         ),
         Header: t('Dataset'),
@@ -765,28 +768,8 @@ function ChartList(props: ChartListProps) {
   );
 
   const subMenuButtons: SubMenuProps['buttons'] = [];
-  if (canDelete || canExport) {
-    subMenuButtons.push({
-      name: t('Bulk select'),
-      buttonStyle: 'secondary',
-      'data-test': 'bulk-select',
-      onClick: toggleBulkSelect,
-    });
-  }
-  if (canCreate) {
-    subMenuButtons.push({
-      name: (
-        <>
-          <Icons.PlusOutlined iconSize="m" />
-          <span>{t('Chart')}</span>
-        </>
-      ),
-      buttonStyle: 'primary',
-      onClick: () => {
-        history.push('/chart/add');
-      },
-    });
 
+  if (canCreate) {
     subMenuButtons.push({
       name: (
         <Tooltip
@@ -799,6 +782,26 @@ function ChartList(props: ChartListProps) {
       ),
       buttonStyle: 'link',
       onClick: openChartImportModal,
+    });
+  }
+
+  if (canDelete || canExport) {
+    subMenuButtons.push({
+      name: t('Bulk select'),
+      buttonStyle: 'secondary',
+      'data-test': 'bulk-select',
+      onClick: toggleBulkSelect,
+    });
+  }
+
+  if (canCreate) {
+    subMenuButtons.push({
+      icon: <Icons.PlusOutlined iconSize="m" />,
+      name: t('Chart'),
+      buttonStyle: 'primary',
+      onClick: () => {
+        history.push('/chart/add');
+      },
     });
   }
 
@@ -819,6 +822,7 @@ function ChartList(props: ChartListProps) {
         onConfirm={handleBulkChartDelete}
       >
         {confirmDelete => {
+          const enableBulkTag = isFeatureEnabled(FeatureFlag.TaggingSystem);
           const bulkActions: ListViewProps['bulkActions'] = [];
           if (canDelete) {
             bulkActions.push({
@@ -853,7 +857,7 @@ function ChartList(props: ChartListProps) {
               loading={loading}
               pageSize={PAGE_SIZE}
               renderCard={renderCard}
-              enableBulkTag
+              enableBulkTag={enableBulkTag}
               bulkTagResourceName="chart"
               addSuccessToast={addSuccessToast}
               addDangerToast={addDangerToast}
