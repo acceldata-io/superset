@@ -32,7 +32,10 @@ import { fetchUserOptions } from 'src/features/groups/utils';
 export type ActionLogObject = {
   user: {
     username: string;
+    first_name?: string;
+    last_name?: string;
   };
+
   action: string;
   dttm: string | null;
   dashboard_id?: number;
@@ -152,7 +155,22 @@ function ActionLogList() {
           row: {
             original: { user },
           },
-        }: any) => <span>{user?.username}</span>,
+        }: any) => {
+          const username = user?.username ?? '';
+          const fullName = [user?.first_name, user?.last_name]
+            .filter(Boolean)
+            .join(' ');
+
+          const displayName = fullName || username;
+
+          return (
+            <Typography.Text
+              ellipsis={fullName ? { tooltip: { title: username } } : true}
+            >
+              {displayName}
+            </Typography.Text>
+          );
+        },
       },
 
       {
