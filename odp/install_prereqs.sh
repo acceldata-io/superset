@@ -114,7 +114,9 @@ ensure_pip_rhel() {
         log "Bootstrapping pip for ${PY} ..."
         ${PY} -m ensurepip --upgrade || curl -fsSL https://bootstrap.pypa.io/get-pip.py | ${PY}
     fi
-    ${PY} -m pip install --upgrade pip setuptools wheel
+    log "pip available: $(${PY} -m pip --version)"
+    # Don't upgrade system-level pip/setuptools — they're owned by rpm.
+    # The build script creates a venv which gets its own copies.
 }
 
 install_python_ubuntu() {
