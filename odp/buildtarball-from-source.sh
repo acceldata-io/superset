@@ -179,14 +179,14 @@ pip install --upgrade pip setuptools wheel
 echo "Installing pinned base requirements ..."
 pip install -r "${SUPERSET_SOURCE_ROOT}/requirements/base.txt"
 
-# Install Superset itself from local source (editable so static/ is picked up in-place)
+# Install Superset from local source (non-editable so static assets are copied into the venv)
 echo "Installing Superset from local source ..."
-pip install -e "${SUPERSET_SOURCE_ROOT}"
+pip install "${SUPERSET_SOURCE_ROOT}"
 
 # Install optional database driver extras
 if [ -n "${SUPERSET_DB_EXTRAS}" ]; then
     echo "Installing optional DB extras: [${SUPERSET_DB_EXTRAS}] ..."
-    pip install -e "${SUPERSET_SOURCE_ROOT}[${SUPERSET_DB_EXTRAS}]"
+    pip install "${SUPERSET_SOURCE_ROOT}[${SUPERSET_DB_EXTRAS}]"
 fi
 
 # Install additional ODP-specific requirements if present {for future use}

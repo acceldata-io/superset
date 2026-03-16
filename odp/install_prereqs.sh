@@ -155,8 +155,12 @@ install_node_rhel() {
             log "Node.js already installed: $(node --version)"
             return
         fi
-        log "Node.js $(node --version) is too old, upgrading ..."
+        log "Node.js $(node --version) is too old, removing before upgrade ..."
+        yum remove -y nodejs npm 2>/dev/null || true
     fi
+
+    # Disable the RHEL AppStream nodejs module to avoid conflicts
+    yum module disable -y nodejs 2>/dev/null || true
 
     log "Installing Node.js ${NODE_MAJOR}.x (RHEL/CentOS) ..."
     curl -fsSL "https://rpm.nodesource.com/setup_${NODE_MAJOR}.x" | bash -
