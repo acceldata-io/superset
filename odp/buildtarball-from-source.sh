@@ -196,6 +196,13 @@ if [ -f "${ODP_REQUIREMENTS}" ]; then
     pip install -r "${ODP_REQUIREMENTS}"
 fi
 
+# Install additional requirements (e.g. extra DB drivers) before packing
+ADDITIONAL_REQUIREMENTS="${SCRIPT_DIR}/additional_requirements.txt"
+if [ -f "${ADDITIONAL_REQUIREMENTS}" ]; then
+    echo "Installing additional requirements from ${ADDITIONAL_REQUIREMENTS} ..."
+    pip install -r "${ADDITIONAL_REQUIREMENTS}"
+fi
+
 # ===================================================================
 # Step 6: Build Backend Translations (.po -> .mo)
 # ===================================================================

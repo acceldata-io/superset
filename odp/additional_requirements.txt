@@ -1,0 +1,6 @@
+pymysql==1.1.2
+gevent==24.11.1
+pyhive==0.7.0
+thrift==0.22.0
+thrift-sasl==0.4.3
+pykerberos==1.2.4

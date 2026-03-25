@@ -70,6 +70,7 @@ install_system_packages_rhel() {
         openssl-devel libffi-devel readline-devel sqlite-devel \
         xz-devel tk-devel \
         cyrus-sasl-devel cyrus-sasl-gssapi \
+        krb5-devel \
         postgresql-devel \
         openldap-devel \
         libpq-devel \
@@ -87,6 +88,7 @@ install_system_packages_ubuntu() {
         libreadline-dev libsqlite3-dev libncurses5-dev \
         libncursesw5-dev xz-utils tk-dev liblzma-dev \
         libsasl2-dev libsasl2-modules-gssapi-mit \
+        libkrb5-dev \
         libpq-dev libecpg-dev \
         libldap2-dev \
         jq
