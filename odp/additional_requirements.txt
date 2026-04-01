@@ -1,6 +1,18 @@
-pymysql==1.1.2
-gevent==24.11.1
-pyhive==0.7.0
-thrift==0.22.0
-thrift-sasl==0.4.3
-pykerberos==1.2.4
+pymysql==1.1.2                  # MySQL (pure Python)
+mysqlclient==2.2.8              # MySQL (C-based, faster, needs libmysqlclient-dev)
+pydruid==0.6.9                  # Apache Druid
+pinotdb==5.7.0                  # Apache Pinot
+pyhive[hive_pure_sasl]==0.7.0   # Hive
+thrift==0.22.0                  # Hive dependency
+thrift-sasl==0.4.3              # Hive SASL auth
+pykerberos==1.2.4               # Kerberos auth
+trino==0.337.0                  # Trino
+impyla==0.22.0                  # Impala
+clickhouse-connect==0.15.0      # ClickHouse
+
+gevent==25.9.1                  # Async worker
+
+redis==4.6.0                    # Celery broker/backend (Redis)
+celery[redis]==5.4.0            # Celery with Redis support
+flower==2.0.1                   # Celery web monitor
+pymemcache==4.0.0               # Memcached client (pure Python)

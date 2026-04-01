@@ -74,6 +74,7 @@ install_system_packages_rhel() {
         postgresql-devel \
         openldap-devel \
         libpq-devel \
+        mysql-devel \
         pkg-config \
         jq
 }
@@ -91,6 +92,7 @@ install_system_packages_ubuntu() {
         libkrb5-dev \
         libpq-dev libecpg-dev \
         libldap2-dev \
+        libmysqlclient-dev \
         jq
 }
 
