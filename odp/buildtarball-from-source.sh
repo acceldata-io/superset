@@ -189,13 +189,6 @@ if [ -n "${SUPERSET_DB_EXTRAS}" ]; then
     pip install "${SUPERSET_SOURCE_ROOT}[${SUPERSET_DB_EXTRAS}]"
 fi
 
-# Install additional ODP-specific requirements if present {for future use}
-ODP_REQUIREMENTS="${SCRIPT_DIR}/requirements.txt"
-if [ -f "${ODP_REQUIREMENTS}" ]; then
-    echo "Installing additional ODP requirements from ${ODP_REQUIREMENTS} ..."
-    pip install -r "${ODP_REQUIREMENTS}"
-fi
-
 # Install additional requirements (e.g. extra DB drivers) before packing
 ADDITIONAL_REQUIREMENTS="${SCRIPT_DIR}/additional_requirements.txt"
 if [ -f "${ADDITIONAL_REQUIREMENTS}" ]; then

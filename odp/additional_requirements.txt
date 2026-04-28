@@ -1,16 +1,19 @@
 pymysql==1.1.2                  # MySQL (pure Python)
 mysqlclient==2.2.8              # MySQL (C-based, faster, needs libmysqlclient-dev)
-pydruid==0.6.9                  # Apache Druid
+pydruid[sqlalchemy]==0.6.9      # Apache Druid with SQLAlchemy support
 pinotdb==5.7.0                  # Apache Pinot
 pyhive[hive_pure_sasl]==0.7.0   # Hive
-thrift==0.22.0                  # Hive dependency
 thrift-sasl==0.4.3              # Hive SASL auth
 pykerberos==1.2.4               # Kerberos auth
-trino==0.337.0                  # Trino
-impyla==0.22.0                  # Impala
+trino[sqlalchemy,kerberos]==0.337.0  # Trino with SQLAlchemy and Kerberos support
+impyla==0.22.0                  # Impala (installs thrift==0.16.0)
 clickhouse-connect==0.15.0      # ClickHouse
 
-gevent==25.9.1                  # Async worker
+prophet==1.2.2                  # Forecasting; >=1.2.1 fixes AttributeError: stan_backend with cmdstanpy 1.3+ (see facebook/prophet#2462)
+playwright==1.58.0              # Alerts & reports: chart/dashboard screenshots (install browsers: playwright install chromium)
+shillelagh[gsheetsapi]==1.4.3   # Google Sheets as a database (gsheets://)
+
+gevent==24.11.1                 # Async worker (compatible with Superset's greenlet constraint)
 
 redis==4.6.0                    # Celery broker/backend (Redis)
 celery[redis]==5.4.0            # Celery with Redis support
