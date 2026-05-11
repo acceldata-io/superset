@@ -5,6 +5,7 @@ pinotdb==5.7.0                  # Apache Pinot
 pyhive[hive_pure_sasl]==0.7.0   # Hive
 thrift-sasl==0.4.3              # Hive SASL auth
 pykerberos==1.2.4               # Kerberos auth
+python-ldap==3.4.5              # LDAP / Active Directory authentication
 trino[sqlalchemy,kerberos]==0.337.0  # Trino with SQLAlchemy and Kerberos support
 impyla==0.22.0                  # Impala (installs thrift==0.16.0)
 clickhouse-connect==0.15.0      # ClickHouse
