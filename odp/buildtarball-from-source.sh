@@ -274,6 +274,10 @@ print(f'{count} files in {assets}')
 ")
 echo "Frontend assets: ${STATIC_ASSETS}"
 
+# venv-pack does not support editable (-e) installs, so switch to a real install just before packaging
+pip uninstall -y apache-superset-core
+pip install --no-deps "${SUPERSET_SOURCE_ROOT}/superset-core"
+
 # Pack the virtual environment using venv-pack
 echo ""
 echo "Packing virtual environment into tarball ..."
