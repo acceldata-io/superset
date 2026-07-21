@@ -279,7 +279,7 @@ prompt-toolkit==3.0.51
     # via click-repl
 pyarrow==16.1.0
     # via apache-superset (pyproject.toml)
-pyasn1==0.6.1
+pyasn1==0.6.3
     # via
     #   pyasn1-modules
     #   rsa
