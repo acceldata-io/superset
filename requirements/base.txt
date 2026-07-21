@@ -289,7 +289,7 @@ pycparser==2.22
     # via cffi
 pygments==2.19.1
     # via rich
-pyjwt==2.10.1
+pyjwt==2.12.0
     # via
     #   apache-superset (pyproject.toml)
     #   flask-appbuilder
