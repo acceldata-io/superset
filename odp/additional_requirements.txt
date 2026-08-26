@@ -20,3 +20,6 @@ redis==5.3.1                    # Celery broker/backend (Redis)
 celery[redis]==5.6.3            # Celery with Redis support
 flower==2.0.1                   # Celery web monitor
 pymemcache==4.0.0               # Memcached client (pure Python)
+
+rich==15.0.0                    # Used by superset/cli/test_db.py; missing from upstream pyproject.toml
+cachetools==7.1.4               # Used by superset/db_engine_specs/aws_iam.py; missing from upstream pyproject.toml
