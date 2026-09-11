@@ -84,7 +84,7 @@ cron-descriptor==2.1.0
     # via apache-superset (pyproject.toml)
 croniter==6.2.3
     # via apache-superset (pyproject.toml)
-cryptography==46.0.7
+cryptography==50.0.1
     # via
     #   apache-superset (pyproject.toml)
     #   google-auth
