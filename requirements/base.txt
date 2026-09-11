@@ -230,7 +230,7 @@ marshmallow-sqlalchemy==1.4.0
     #   flask-appbuilder
 marshmallow-union==0.1.15.post1
     # via apache-superset (pyproject.toml)
-msgpack==1.0.8
+msgpack==1.2.2
     # via apache-superset (pyproject.toml)
 msgspec==0.21.1
     # via flask-session
