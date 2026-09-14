@@ -438,7 +438,7 @@ mdurl==0.1.2
     # via
     #   -c requirements/base.txt
     #   markdown-it-py
-msgpack==1.0.8
+msgpack==1.2.2
     # via
     #   -c requirements/base.txt
     #   apache-superset
