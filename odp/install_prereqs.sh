@@ -218,7 +218,7 @@ main() {
     log ""
     log "============================================"
     log "Prerequisites installed successfully"
-    log "  Python : $(${PY} --version 2>&1)"
+    log "  Python : $(python --version 2>&1)"
     log "  Node   : $(node --version 2>&1)"
     log "  npm    : $(npm --version 2>&1)"
     log "============================================"

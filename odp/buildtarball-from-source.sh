@@ -103,13 +103,13 @@ else
 fi
 
 # Verify critical tools
-for cmd in ${PY} node npm git; do
+for cmd in python node npm git; do
     if ! command -v ${cmd} &>/dev/null; then
         echo "ERROR: '${cmd}' not found. Run install_prereqs.sh first or install manually."
         exit 1
     fi
 done
-echo "Python : $(${PY} --version 2>&1)"
+echo "Python : $(python --version 2>&1)"
 echo "Node   : $(node --version)"
 echo "npm    : $(npm --version)"
 
@@ -170,7 +170,7 @@ echo ""
 echo "[Step 5/7] Creating Python venv and installing Superset backend"
 
 rm -rf "${VENV_DIR}"
-${PY} -m venv "${VENV_DIR}"
+python -m venv "${VENV_DIR}"
 source "${VENV_DIR}/bin/activate"
 
 pip install --upgrade pip setuptools wheel
@@ -231,7 +231,7 @@ if [ -f /etc/os-release ]; then
 else
     BUILD_OS="unknown"
 fi
-PYTHON_FULL_VERSION=$(${PY} --version 2>&1 | awk '{print $2}')
+PYTHON_FULL_VERSION=$(python --version 2>&1 | awk '{print $2}')
 
 BUILD_INFO_FILE="${VENV_DIR}/BUILD_INFO"
 cat > "${BUILD_INFO_FILE}" <<BEOF
@@ -262,10 +262,10 @@ if [ "${INSTALLED_VERSION}" = "NOT_FOUND" ]; then
     echo "Installed apache_superset version: ${INSTALLED_VERSION}"
 fi
 
-${PY} -c "import superset; print(f'Superset module loaded from: {superset.__file__}')"
+python -c "import superset; print(f'Superset module loaded from: {superset.__file__}')"
 
 # Verify frontend assets are accessible to the installed package
-STATIC_ASSETS=$(${PY} -c "
+STATIC_ASSETS=$(python -c "
 import os, superset
 base = os.path.dirname(superset.__file__)
 assets = os.path.join(base, 'static', 'assets')
