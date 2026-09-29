@@ -238,7 +238,7 @@ nh3==0.2.22
     # via apache-superset (pyproject.toml)
 numexpr==2.14.1
     # via -r requirements/base.in
-numpy==2.5.1
+numpy==2.4.6
     # via
     #   apache-superset (pyproject.toml)
     #   bottleneck
