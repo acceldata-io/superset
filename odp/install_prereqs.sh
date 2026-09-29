@@ -202,12 +202,12 @@ main() {
     case "${OS_ID}" in
         rhel|centos|rocky|almalinux|fedora)
             install_system_packages_rhel
-            install_python_rhel
+#            install_python_rhel
             install_node_rhel
             ;;
         ubuntu|debian)
             install_system_packages_ubuntu
-            install_python_ubuntu
+#            install_python_ubuntu
             install_node_ubuntu
             ;;
         *)
