@@ -563,7 +563,7 @@ nh3==0.2.22
     #   apache-superset
 nodeenv==1.10.0
     # via pre-commit
-numpy==2.5.1
+numpy==2.4.6
     # via
     #   -c requirements/base-constraint.txt
     #   apache-superset
