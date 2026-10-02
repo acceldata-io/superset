@@ -71,12 +71,20 @@ install_system_packages_rhel() {
         xz-devel tk-devel \
         cyrus-sasl-devel cyrus-sasl-gssapi \
         krb5-devel \
-        postgresql-devel \
         openldap-devel \
         libpq-devel \
         mysql-devel \
         pkg-config \
         jq
+
+    # On EL10+, the "postgresql-devel" metapackage pulls in
+    # postgresql-private-devel, which Conflicts with libpq-devel (both ship
+    # libpq.so/pg_config). libpq-devel alone is sufficient to build
+    # psycopg2, so only pull in postgresql-devel on EL8/EL9 where the two
+    # packages coexist without conflict.
+    if [ "${OS_MAJOR}" -lt 10 ]; then
+        yum_install postgresql-devel
+    fi
 }
 
 install_system_packages_ubuntu() {
