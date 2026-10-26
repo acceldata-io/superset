@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Install prerequisites for building Apache Superset from source.
 # Idempotent — safe to run multiple times.
-# Supported: RHEL 8/9 (and clones), Ubuntu 20.04/22.04
+# Supported: RHEL 8/9/10 (and clones), Ubuntu 20.04/22.04
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -92,12 +92,17 @@ install_system_packages_rhel() {
         xz-devel tk-devel \
         cyrus-sasl-devel cyrus-sasl-gssapi \
         krb5-devel \
-        postgresql-devel \
         openldap-devel \
         libpq-devel \
         mysql-devel \
         pkg-config \
         jq
+    # On el10, postgresql-devel resolves to postgresql-private-devel, which
+    # conflicts with libpq-devel (the latter already provides libpq-fe.h and
+    # pg_config), so only install it on older releases.
+    if [ "${OS_MAJOR}" -lt 10 ]; then
+        yum_install postgresql-devel
+    fi
 }
 
 install_system_packages_ubuntu() {
