@@ -34,12 +34,33 @@ detect_os() {
 # ---------------------------------------------------------------------------
 # Package manager wrappers (idempotent)
 # ---------------------------------------------------------------------------
+# RHEL 8 keeps the rpm database in Berkeley DB. /var/lib/rpm/__db.* are only
+# the BDB environment (locks/shared-memory cache); the package data lives in
+# Packages, Name, Basenames, ... The build images ship __db.* files that the
+# container cannot open for writing, so the first yum transaction fails with:
+#   db5 error(-30969) from dbenv->open: BDB0091 DB_VERSION_MISMATCH
+#   cannot open Packages database in /var/lib/rpm
+# A yum transaction that updates glibc leaves them stale again. rpm recreates
+# the environment on the next open, so removing them before each write is safe.
+# RHEL 9+ uses sqlite and has no __db.* files, so this is a no-op there.
+reset_rpmdb_env() {
+    if compgen -G "/var/lib/rpm/__db.*" > /dev/null; then
+        log "Clearing stale rpm Berkeley DB environment (/var/lib/rpm/__db.*)"
+        rm -f /var/lib/rpm/__db.*
+    fi
+}
+
+yum_cmd() {
+    reset_rpmdb_env
+    yum "$@"
+}
+
 yum_install() {
     local pkg
     for pkg in "$@"; do
         if ! rpm -q "${pkg}" &>/dev/null; then
             log "Installing ${pkg} ..."
-            yum install -y "${pkg}"
+            yum_cmd install -y "${pkg}"
         else
             log "${pkg} already installed"
         fi
@@ -63,8 +84,8 @@ apt_install() {
 # ---------------------------------------------------------------------------
 install_system_packages_rhel() {
     log "Installing system packages (RHEL/CentOS/Rocky ${OS_MAJOR}) ..."
-    yum install -y epel-release || true
-    yum groupinstall -y "Development Tools" || yum install -y gcc gcc-c++ make
+    yum_cmd install -y epel-release || true
+    yum_cmd groupinstall -y "Development Tools" || yum_cmd install -y gcc gcc-c++ make
     yum_install \
         git curl wget tar gzip bzip2 zlib-devel bzip2-devel \
         openssl-devel libffi-devel readline-devel sqlite-devel \
@@ -159,17 +180,36 @@ install_node_rhel() {
             log "Node.js already installed: $(node --version)"
             return
         fi
-        log "Node.js $(node --version) is too old, removing before upgrade ..."
-        yum remove -y nodejs npm 2>/dev/null || true
+        log "Node.js $(node --version) at $(command -v node) is too old, upgrading ..."
     fi
 
-    # Disable the RHEL AppStream nodejs module to avoid conflicts
-    yum module disable -y nodejs 2>/dev/null || true
+    # Distro (AppStream) Node.js RPMs conflict with the NodeSource nodejs RPM.
+    # nodejs-full-i18n pins the distro nodejs version, so remove every nodejs* RPM.
+    local old_pkgs
+    old_pkgs="$(rpm -qa 'nodejs*' 'npm' | grep -v nodesource || true)"
+    if [ -n "${old_pkgs}" ]; then
+        log "Removing distro Node.js packages: $(echo ${old_pkgs})"
+        # shellcheck disable=SC2086
+        yum_cmd remove -y ${old_pkgs}
+    fi
+
+    # The AppStream nodejs module filters out / conflicts with NodeSource RPMs
+    yum_cmd module reset -y nodejs || warn "yum module reset nodejs failed"
+    yum_cmd module disable -y nodejs || warn "yum module disable nodejs failed"
 
     log "Installing Node.js ${NODE_MAJOR}.x (RHEL/CentOS) ..."
     curl -fsSL "https://rpm.nodesource.com/setup_${NODE_MAJOR}.x" | bash -
-    yum install -y nodejs
-    log "Node.js installed: $(node --version)"
+    yum_cmd install -y --allowerasing nodejs
+
+    local rpm_major
+    rpm_major="$(/usr/bin/node --version | sed 's/v//' | cut -d. -f1)"
+    if [ "${rpm_major}" -lt "${NODE_MAJOR}" ]; then
+        die "/usr/bin/node is $(/usr/bin/node --version) after install; expected ${NODE_MAJOR}.x"
+    fi
+    if [ "$(command -v node)" != "/usr/bin/node" ]; then
+        warn "$(command -v node) ($(node --version)) shadows /usr/bin/node ($(/usr/bin/node --version)) on PATH"
+    fi
+    log "Node.js installed: $(/usr/bin/node --version)"
 }
 
 install_node_ubuntu() {
