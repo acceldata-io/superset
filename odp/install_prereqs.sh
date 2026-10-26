@@ -46,6 +46,15 @@ yum_install() {
     done
 }
 
+rpmdb_debug() {
+    log "DEBUG[$1]: rpm=$(rpm --version 2>&1) glibc=$(rpm -q glibc 2>&1) libdb=$(rpm -q libdb 2>&1)"
+    log "DEBUG[$1]: uid=$(id -u) LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-<unset>} LD_PRELOAD=${LD_PRELOAD:-<unset>}"
+    log "DEBUG[$1]: /var/lib/rpm contents:"
+    ls -la /var/lib/rpm/ 2>&1 || true
+    log "DEBUG[$1]: installed nodejs/npm packages:"
+    rpm -qa 'nodejs*' 'npm' 2>&1 || log "DEBUG[$1]: rpm -qa exit code = $?"
+}
+
 apt_install() {
     local pkg
     for pkg in "$@"; do
@@ -63,8 +72,12 @@ apt_install() {
 # ---------------------------------------------------------------------------
 install_system_packages_rhel() {
     log "Installing system packages (RHEL/CentOS/Rocky ${OS_MAJOR}) ..."
+    rpmdb_debug "before-system-packages"
     yum install -y epel-release || true
     yum groupinstall -y "Development Tools" || yum install -y gcc gcc-c++ make
+    rpmdb_debug "after-development-tools"
+    log "DEBUG: 20 most recently installed/updated packages:"
+    rpm -qa --last 2>&1 | head -20 || true
     yum_install \
         git curl wget tar gzip bzip2 zlib-devel bzip2-devel \
         openssl-devel libffi-devel readline-devel sqlite-devel \
@@ -159,12 +172,18 @@ install_node_rhel() {
             log "Node.js already installed: $(node --version)"
             return
         fi
-        log "Node.js $(node --version) is too old, removing before upgrade ..."
-        yum remove -y nodejs npm 2>/dev/null || true
+        log "Node.js $(node --version) at $(command -v node) is too old, removing before upgrade ..."
+        rpmdb_debug "before-node-remove"
+        local rc=0
+        yum remove -y nodejs npm || rc=$?
+        log "DEBUG: yum remove nodejs npm exit code = ${rc}"
+        rpmdb_debug "after-node-remove"
     fi
 
     # Disable the RHEL AppStream nodejs module to avoid conflicts
-    yum module disable -y nodejs 2>/dev/null || true
+    local mrc=0
+    yum module disable -y nodejs || mrc=$?
+    log "DEBUG: yum module disable nodejs exit code = ${mrc}"
 
     log "Installing Node.js ${NODE_MAJOR}.x (RHEL/CentOS) ..."
     curl -fsSL "https://rpm.nodesource.com/setup_${NODE_MAJOR}.x" | bash -
