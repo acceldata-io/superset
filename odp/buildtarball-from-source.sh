@@ -22,8 +22,9 @@ SUPERSET_SOURCE_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-PY=python3.11
-PY_VERSION=3.11
+# Interpreter is chosen in select_python. el8/el9 stay on Python 3.11.
+# el10 has no python3.11 package; a venv built there must use python3.12 or
+# bin/python is left pointing at a build-host path the target does not have.
 NODE_MAJOR=20
 
 SKIP_PREREQS="false"
@@ -37,6 +38,31 @@ while [[ $# -gt 0 ]]; do
         *)               echo "Unknown flag: $1"; exit 1 ;;
     esac
 done
+
+# Bigtop passes PYTHON_VER (python3.11 / python3.12). When it is unset, or
+# still the stack default on a RHEL 10 build host, use the distro interpreter.
+# python -m venv records that interpreter's absolute path in pyvenv.cfg and
+# the bin/python symlinks, so the build host and the target must match.
+select_python() {
+    local py="${PYTHON_VER:-python3.11}"
+    local os_id="" os_major=""
+    if [ -f /etc/os-release ]; then
+        os_id="$(. /etc/os-release && printf '%s' "${ID}")"
+        os_major="$(. /etc/os-release && printf '%s' "${VERSION_ID%%.*}")"
+    fi
+    case "${os_id}" in
+        rhel|centos|rocky|almalinux|ol|oraclelinux)
+            if [ "${os_major}" = "10" ] && [ "${py}" != "python3.12" ]; then
+                echo "RHEL ${os_major} ships Python 3.12 only; using python3.12 instead of ${py}"
+                py="python3.12"
+            fi
+            ;;
+    esac
+    PY="${py}"
+    PY_VERSION="${py#python}"
+    export PYTHON_VER="${PY}"
+}
+select_python
 
 # ---------------------------------------------------------------------------
 # Read versions
@@ -67,6 +93,7 @@ echo "Superset Version  : ${SUPERSET_VERSION}"
 echo "ODP Version       : ${ODP_VERSION}"
 echo "Combined Version  : ${ODP_SUPERSET_VERSION}"
 echo "DB Extras         : ${SUPERSET_DB_EXTRAS}"
+echo "Python            : ${PY}"
 echo "Tarball           : ${TARBALL_NAME}"
 echo "============================================"
 
