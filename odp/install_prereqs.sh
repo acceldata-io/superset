@@ -10,6 +10,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Configuration
 # ---------------------------------------------------------------------------
 NODE_MAJOR=20               # Node.js LTS required by superset-frontend
+# Set by select_python() after the OS is known. Defaults match el8/el9.
 PY=python3.11
 PY_VERSION=3.11
 
@@ -29,6 +30,24 @@ detect_os() {
     OS_VERSION="${VERSION_ID}"
     OS_MAJOR="${VERSION_ID%%.*}"
     log "Detected OS: ${OS_ID} ${OS_VERSION}"
+}
+
+# PYTHON_VER comes from Bigtop. el10 has no python3.11 RPM, and a venv created
+# with a build-host python3.11 keeps that absolute path. Use python3.12 there.
+select_python() {
+    local py="${PYTHON_VER:-python3.11}"
+    case "${OS_ID}" in
+        rhel|centos|rocky|almalinux|ol|oraclelinux)
+            if [ "${OS_MAJOR}" = "10" ] && [ "${py}" != "python3.12" ]; then
+                log "RHEL ${OS_MAJOR} ships Python 3.12 only; using python3.12 instead of ${py}"
+                py="python3.12"
+            fi
+            ;;
+    esac
+    PY="${py}"
+    PY_VERSION="${py#python}"
+    export PYTHON_VER="${PY}"
+    log "Selected Python: ${PY}"
 }
 
 # ---------------------------------------------------------------------------
@@ -123,18 +142,27 @@ install_system_packages_ubuntu() {
 }
 
 # ---------------------------------------------------------------------------
-# Python 3.11 (yum on RHEL, deadsnakes PPA on Ubuntu)
+# Python (yum on RHEL, deadsnakes PPA on Ubuntu)
 # ---------------------------------------------------------------------------
 install_python_rhel() {
-    if command -v ${PY} &>/dev/null; then
+    if command -v "${PY}" &>/dev/null; then
         log "${PY} already available: $(${PY} --version)"
         ensure_pip_rhel
         return
     fi
 
     log "Installing Python ${PY_VERSION} via yum ..."
-    yum_install python3.11 python3.11-pip python3.11-devel
+    if [ "${PY_VERSION}" = "3.12" ]; then
+        # el10 dropped versioned AppStream packages. The python3 RPM is 3.12
+        # and provides /usr/bin/python3.12.
+        yum_install python3 python3-pip python3-devel
+    else
+        yum_install "python${PY_VERSION}" "python${PY_VERSION}-pip" "python${PY_VERSION}-devel"
+    fi
 
+    if ! command -v "${PY}" &>/dev/null; then
+        die "${PY} is not on PATH after installing Python ${PY_VERSION}"
+    fi
     log "Python installed: $(${PY} --version)"
     ensure_pip_rhel
 }
@@ -243,6 +271,7 @@ main() {
     log "============================================"
 
     detect_os
+    select_python
 
     case "${OS_ID}" in
         rhel|centos|rocky|almalinux|fedora)
@@ -256,7 +285,7 @@ main() {
             install_node_ubuntu
             ;;
         *)
-            die "Unsupported OS: ${OS_ID} ${OS_VERSION}. Supported: RHEL 8/9, Ubuntu 20/22."
+            die "Unsupported OS: ${OS_ID} ${OS_VERSION}. Supported: RHEL 8/9/10, Ubuntu 20/22."
             ;;
     esac
 
