@@ -527,6 +527,9 @@ DEFAULT_FEATURE_FLAGS: dict[str, bool] = {
     # When True, this escapes HTML (rather than rendering it) in Markdown components
     "ESCAPE_MARKDOWN_HTML": False,
     "DASHBOARD_VIRTUALIZATION": True,
+    # Defer data loading for invisible charts when DASHBOARD_VIRTUALIZATION is enabled
+    # Improves backend performance by only loading data for visible charts
+    "DASHBOARD_VIRTUALIZATION_DEFER_DATA": False,
     # This feature flag is stil in beta and is not recommended for production use.
     "GLOBAL_ASYNC_QUERIES": False,
     "EMBEDDED_SUPERSET": False,
@@ -746,10 +749,12 @@ EXTRA_CATEGORICAL_COLOR_SCHEMES: list[dict[str, Any]] = []
 
 # Default theme configuration
 # Leave empty to use Superset's default theme
+# To customize editor selection color, add: "colorEditorSelection": "#fff5cf"
 THEME_DEFAULT: Theme = {"algorithm": "default"}
 
 # Dark theme configuration
 # Applied when user selects dark mode
+# To customize editor selection color, add: "colorEditorSelection": "#5c4d1a"
 THEME_DARK: Theme = {"algorithm": "dark"}
 
 # Theme behavior and user preference settings

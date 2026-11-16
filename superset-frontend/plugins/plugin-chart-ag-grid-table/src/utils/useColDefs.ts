@@ -66,11 +66,22 @@ function getValueRange(
   alignPositiveNegative: boolean,
   data: InputData[],
 ) {
-  if (typeof data?.[0]?.[key] === 'number') {
-    const nums = data.map(row => row[key]) as number[];
-    return (
-      alignPositiveNegative ? [0, d3Max(nums.map(Math.abs))] : d3Extent(nums)
-    ) as ValueRange;
+  const nums = data
+    .map(row => {
+      const raw = row[key];
+      return raw instanceof Number ? raw.valueOf() : raw;
+    })
+    .filter(
+      (value): value is number =>
+        typeof value === 'number' && Number.isFinite(value),
+    ) as number[];
+  if (nums.length > 0) {
+    const maxAbs = d3Max(nums.map(Math.abs));
+    if (alignPositiveNegative) {
+      return [0, maxAbs ?? 0] as ValueRange;
+    }
+    const extent = d3Extent(nums) as ValueRange | undefined;
+    return extent ?? [0, 0];
   }
   return null;
 }
@@ -183,6 +194,7 @@ export const useColDefs = ({
       const isTextColumn =
         dataType === GenericDataType.String ||
         dataType === GenericDataType.Temporal;
+      const isBooleanColumn = dataType === GenericDataType.Boolean;
 
       const valueRange =
         !hasBasicColorFormatters &&
@@ -238,18 +250,25 @@ export const useColDefs = ({
             'last',
           ],
         }),
-        cellRenderer: (p: CellRendererProps) =>
-          isTextColumn ? TextCellRenderer(p) : NumericCellRenderer(p),
-        cellRendererParams: {
-          allowRenderHtml: true,
-          columns,
-          hasBasicColorFormatters,
-          col,
-          basicColorFormatters,
-          valueRange,
-          alignPositiveNegative: alignPN || alignPositiveNegative,
-          colorPositiveNegative,
-        },
+        ...(isBooleanColumn
+          ? {
+              cellRenderer: 'agCheckboxCellRenderer',
+              cellRendererParams: { disabled: true },
+            }
+          : {
+              cellRenderer: (p: CellRendererProps) =>
+                isTextColumn ? TextCellRenderer(p) : NumericCellRenderer(p),
+              cellRendererParams: {
+                allowRenderHtml: true,
+                columns,
+                hasBasicColorFormatters,
+                col,
+                basicColorFormatters,
+                valueRange,
+                alignPositiveNegative: alignPN || alignPositiveNegative,
+                colorPositiveNegative,
+              },
+            }),
         context: {
           isMetric,
           isPercentMetric,

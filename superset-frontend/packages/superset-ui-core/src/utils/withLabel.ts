@@ -17,45 +17,27 @@
  * under the License.
  */
 
-.superset-legacy-chart-country-map svg {
-  background-color: #feffff;
-}
+import type { ValidatorFunction } from '../validator';
 
-.superset-legacy-chart-country-map {
-  position: relative;
-}
-
-.superset-legacy-chart-country-map .background {
-  fill: rgba(255, 255, 255, 0);
-  pointer-events: all;
-}
-
-.superset-legacy-chart-country-map .map-layer {
-  fill: #fff;
-  stroke: #aaa;
-}
-
-.superset-legacy-chart-country-map .effect-layer {
-  pointer-events: none;
-}
-
-.superset-legacy-chart-country-map .text-layer {
-  color: #333333;
-  text-anchor: middle;
-  pointer-events: none;
-}
-
-.superset-legacy-chart-country-map text.result-text {
-  font-weight: 300;
-  font-size: 24px;
-}
-
-.superset-legacy-chart-country-map text.big-text {
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.superset-legacy-chart-country-map path.region {
-  cursor: pointer;
-  stroke: #eee;
+/**
+ * Wraps a validator function to prepend a label to its error message.
+ *
+ * @param validator - The validator function to wrap
+ * @param label - The label to prepend to error messages
+ * @returns A new validator function that includes the label in error messages
+ *
+ * @example
+ * validators: [
+ *   withLabel(validateInteger, t('Row limit')),
+ * ]
+ * // Returns: "Row limit is expected to be an integer"
+ */
+export default function withLabel<V = unknown, S = unknown>(
+  validator: ValidatorFunction<V, S>,
+  label: string,
+): ValidatorFunction<V, S> {
+  return (value: V, state?: S): string | false => {
+    const error = validator(value, state);
+    return error ? `${label} ${error}` : false;
+  };
 }
