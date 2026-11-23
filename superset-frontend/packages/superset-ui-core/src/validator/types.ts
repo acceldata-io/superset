@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -17,12 +17,11 @@
  * under the License.
  */
 
-import { getFormattedUTCTime } from '../src/utils';
-
-describe('getFormattedUTCTime', () => {
-  it('formatted date string should equal to UTC date', () => {
-    const ts = 1420070400000; // 2015.01.01 00:00:00 UTC
-    const formattedTime = getFormattedUTCTime(ts, '%Y-%m-%d %H:%M:%S');
-    expect(formattedTime).toEqual('2015-01-01 00:00:00');
-  });
-});
+/**
+ * Type definition for a validator function.
+ * Returns an error message string if validation fails, or false if validation passes.
+ */
+export type ValidatorFunction<V = unknown, S = unknown> = (
+  value: V,
+  state?: S,
+) => string | false;

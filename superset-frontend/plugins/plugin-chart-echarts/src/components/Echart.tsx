@@ -131,6 +131,7 @@ function Echart(
     zrEventHandlers,
     selectedValues = {},
     refs,
+    vizType,
   }: EchartsProps,
   ref: Ref<EchartsHandler>,
 ) {
@@ -225,6 +226,9 @@ function Echart(
             axisLine: { lineStyle: { color: antdTheme.colorSplit } },
             axisLabel: { color: antdTheme.colorTextSecondary },
             splitLine: { lineStyle: { color: antdTheme.colorSplit } },
+            minorSplitLine: {
+              lineStyle: { color: antdTheme.colorBorderSecondary },
+            },
           };
         }
         if (options?.yAxis) {
@@ -232,6 +236,9 @@ function Echart(
             axisLine: { lineStyle: { color: antdTheme.colorSplit } },
             axisLabel: { color: antdTheme.colorTextSecondary },
             splitLine: { lineStyle: { color: antdTheme.colorSplit } },
+            minorSplitLine: {
+              lineStyle: { color: antdTheme.colorBorderSecondary },
+            },
           };
         }
         return echartsTheme;

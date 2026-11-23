@@ -54,6 +54,7 @@ import {
   t,
   validateMaxValue,
   validateServerPagination,
+  withLabel,
 } from '@superset-ui/core';
 
 import { isEmpty, last } from 'lodash';
@@ -253,7 +254,7 @@ const config: ControlPanelConfig = {
               visibility: ({ controls }) => {
                 const dttmLookup = Object.fromEntries(
                   ensureIsArray(controls?.groupby?.options).map(option => [
-                    option.column_name,
+                    (option.column_name || '').toLowerCase(),
                     option.is_dttm,
                   ]),
                 );
@@ -264,7 +265,7 @@ const config: ControlPanelConfig = {
                       return true;
                     }
                     if (isPhysicalColumn(selection)) {
-                      return !!dttmLookup[selection];
+                      return !!dttmLookup[(selection || '').toLowerCase()];
                     }
                     return false;
                   })
@@ -387,7 +388,7 @@ const config: ControlPanelConfig = {
               description: t('Rows per page, 0 means no pagination'),
               visibility: ({ controls }: ControlPanelsContainerProps) =>
                 Boolean(controls?.server_pagination?.value),
-              validators: [validateInteger],
+              validators: [withLabel(validateInteger, t('Server Page Length'))],
             },
           },
         ],
@@ -406,7 +407,7 @@ const config: ControlPanelConfig = {
                   state?.common?.conf?.SQL_MAX_ROW,
               }),
               validators: [
-                validateInteger,
+                withLabel(validateInteger, t('Row limit')),
                 (v, state) =>
                   validateMaxValue(
                     v,

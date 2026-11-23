@@ -769,7 +769,7 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
     setValidationErrors(null);
     setHasValidated(false);
     clearError();
-  }, [setValidationErrors, setHasValidated]);
+  }, [setValidationErrors, setHasValidated, clearError]);
 
   const handleParametersChange = useCallback(
     ({ target }: { target: HTMLInputElement }) => {
@@ -781,6 +781,17 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
       });
     },
     [onChange],
+  );
+
+  const handleChangeWithValidation = useCallback(
+    (
+      actionType: ActionType,
+      payload: CustomTextType | DBReducerPayloadType,
+    ) => {
+      onChange(actionType, payload);
+      handleClearValidationErrors();
+    },
+    [onChange, handleClearValidationErrors],
   );
 
   const onClose = () => {
@@ -1735,13 +1746,13 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
           setDB({ type: ActionType.AddTableCatalogSheet });
         }}
         onQueryChange={({ target }: { target: HTMLInputElement }) =>
-          onChange(ActionType.QueryChange, {
+          handleChangeWithValidation(ActionType.QueryChange, {
             name: target.name,
             value: target.value,
           })
         }
         onExtraInputChange={({ target }: { target: HTMLInputElement }) =>
-          onChange(ActionType.ExtraInputChange, {
+          handleChangeWithValidation(ActionType.ExtraInputChange, {
             name: target.name,
             value: target.value,
           })
@@ -1751,7 +1762,7 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
         }: {
           target: HTMLInputElement;
         }) =>
-          onChange(ActionType.EncryptedExtraInputChange, {
+          handleChangeWithValidation(ActionType.EncryptedExtraInputChange, {
             name: target.name,
             value: target.value,
           })
@@ -1764,7 +1775,7 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
         }}
         onParametersChange={handleParametersChange}
         onChange={({ target }: { target: HTMLInputElement }) =>
-          onChange(ActionType.TextChange, {
+          handleChangeWithValidation(ActionType.TextChange, {
             name: target.name,
             value: target.value,
           })
@@ -1790,7 +1801,7 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
             e: CheckboxChangeEvent | React.ChangeEvent<HTMLInputElement>,
           ) => {
             const { target } = e;
-            onChange(ActionType.InputChange, {
+            handleChangeWithValidation(ActionType.InputChange, {
               type: target.type,
               name: target.name,
               checked: 'checked' in target ? target.checked : false,
@@ -1798,19 +1809,19 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
             });
           }}
           onTextChange={({ target }: { target: HTMLTextAreaElement }) =>
-            onChange(ActionType.TextChange, {
+            handleChangeWithValidation(ActionType.TextChange, {
               name: target.name,
               value: target.value,
             })
           }
           onEditorChange={(payload: { name: string; json: any }) =>
-            onChange(ActionType.EditorChange, payload)
+            handleChangeWithValidation(ActionType.EditorChange, payload)
           }
           onExtraInputChange={(
             e: CheckboxChangeEvent | React.ChangeEvent<HTMLInputElement>,
           ) => {
             const { target } = e;
-            onChange(ActionType.ExtraInputChange, {
+            handleChangeWithValidation(ActionType.ExtraInputChange, {
               type: target.type,
               name: target.name,
               checked: 'checked' in target ? target.checked : false,
@@ -1818,7 +1829,7 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
             });
           }}
           onExtraEditorChange={(payload: { name: string; json: any }) =>
-            onChange(ActionType.ExtraEditorChange, payload)
+            handleChangeWithValidation(ActionType.ExtraEditorChange, payload)
           }
         />
       );
@@ -2037,36 +2048,39 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
                 db={db as DatabaseObject}
                 onInputChange={(e: CheckboxChangeEvent) => {
                   const { target } = e;
-                  onChange(ActionType.InputChange, {
+                  handleChangeWithValidation(ActionType.InputChange, {
                     type: target.type,
                     name: target.name,
                     checked: target.checked,
                     value: target.value,
                   });
                 }}
-                onTextChange={({ target }: { target: HTMLTextAreaElement }) => {
-                  onChange(ActionType.TextChange, {
+                onTextChange={({ target }: { target: HTMLTextAreaElement }) =>
+                  handleChangeWithValidation(ActionType.TextChange, {
                     name: target.name,
                     value: target.value,
-                  });
-                }}
-                onEditorChange={(payload: { name: string; json: any }) => {
-                  onChange(ActionType.EditorChange, payload);
-                }}
+                  })
+                }
+                onEditorChange={(payload: { name: string; json: any }) =>
+                  handleChangeWithValidation(ActionType.EditorChange, payload)
+                }
                 onExtraInputChange={(
                   e: React.ChangeEvent<HTMLInputElement> | CheckboxChangeEvent,
                 ) => {
                   const { target } = e;
-                  onChange(ActionType.ExtraInputChange, {
+                  handleChangeWithValidation(ActionType.ExtraInputChange, {
                     type: target.type,
                     name: target.name,
                     checked: target.checked,
                     value: target.value,
                   });
                 }}
-                onExtraEditorChange={(payload: { name: string; json: any }) => {
-                  onChange(ActionType.ExtraEditorChange, payload);
-                }}
+                onExtraEditorChange={(payload: { name: string; json: any }) =>
+                  handleChangeWithValidation(
+                    ActionType.ExtraEditorChange,
+                    payload,
+                  )
+                }
               />
             ),
           },
